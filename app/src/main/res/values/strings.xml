@@ -3,4 +3,5 @@
     <string name="btc_market">BTC Market</string>
     <string name="eth_market">ETH Market</string>
     <string name="usdt_market">USDT Market</string>
+    <string name="twenty_four_hour_trade_amount">24小时成交额</string>
 </resources>

@@ -14,7 +14,7 @@ class MainActivity : BaseActivity() {
     override fun setUpViews(savedInstanceState: Bundle?) {
         supportFragmentManager.beginTransaction().replace(R.id.marketContainer,
                 MarketFragment().apply {
-                    marketName = "BTC market"
+                    marketName = "BTC"
                 }).commit()
     }
 

@@ -10,6 +10,7 @@ import com.devils.binance.R
 import com.devils.binance.data.ProductRespository
 import com.devils.binance.net.NetCallback
 import com.devils.binance.net.model.ProductsList
+import com.devils.binance.widgets.ProgressView
 import com.ysst.consultant.base.fragment.BaseFragment
 
 class MarketFragment : BaseFragment() {
@@ -23,6 +24,8 @@ class MarketFragment : BaseFragment() {
     private lateinit var recyclerView  : RecyclerView
     private lateinit var layoutManager : LinearLayoutManager
     private lateinit var adapter       : MarketAdapter
+
+    private val progress : ProgressView by lazy { ProgressView(mContext) }
 
     private val repo = ProductRespository()
 
@@ -43,9 +46,11 @@ class MarketFragment : BaseFragment() {
     }
 
     override fun work(savedInstanceState: Bundle?) {
+        progress.show()
         repo.fetchData(object : NetCallback<ProductsList>{
 
             override fun onSuccess(result: ProductsList?) {
+                progress.dismiss()
                 if (result != null && result.data != null){
                     adapter.data.clear()
                     result.data.filter { marketName == it.quoteAsset }
@@ -55,6 +60,7 @@ class MarketFragment : BaseFragment() {
             }
 
             override fun onError(message: String?) {
+                progress.dismiss()
                 Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
             }
 

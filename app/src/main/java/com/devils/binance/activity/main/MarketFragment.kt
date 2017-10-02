@@ -110,10 +110,11 @@ class MarketFragment : BaseFragment() {
 //        }
 //    }
 //
-//    override fun onStop() {
-//        mMarketListener?.stop()
-//        super.onStop()
-//    }
+
+    override fun onDestroy() {
+        mMarketListener?.stop()
+        super.onDestroy()
+    }
 
     inner class MarketListener : WebSocketListener() {
 
@@ -126,8 +127,11 @@ class MarketFragment : BaseFragment() {
                     .url("wss://stream2.binance.com:9443/ws/!ticker@arr")
                     .addHeader("Connection", "keep-alive")
                     .build()
-            mWebSocket = App.INSTANCE.httpClient.newWebSocket(request, this)
-            App.INSTANCE.httpClient.dispatcher().executorService().shutdown()
+            val okHttp = App.INSTANCE.createHttpClient()
+            okHttp.newWebSocket(request, this)
+            okHttp.dispatcher().executorService().shutdown()
+//            App.INSTANCE.httpClient.newWebSocket(request, this)
+//            App.INSTANCE.httpClient.dispatcher().executorService().shutdown()
             isRunning = true
         }
 

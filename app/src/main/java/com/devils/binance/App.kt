@@ -43,8 +43,7 @@ class App : Application() {
                 .create()
     }
 
-
-    private fun initRetrofit(){
+    fun createHttpClient() : OkHttpClient {
         //创建一个不验证证书链的证书信任管理器。
         val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
 
@@ -72,13 +71,18 @@ class App : Application() {
         val logInterceptor = HttpLoggingInterceptor()
         logInterceptor.level = HttpLoggingInterceptor.Level.BODY
 
-        httpClient = OkHttpClient.Builder()
+        return OkHttpClient.Builder()
                 .sslSocketFactory(sslContext.socketFactory)
                 .hostnameVerifier(org.apache.http.conn.ssl.SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER)
                 .readTimeout(60, TimeUnit.SECONDS)
                 .connectTimeout(60, TimeUnit.SECONDS)
                 .addInterceptor(logInterceptor)
                 .build()
+    }
+
+
+    private fun initRetrofit(){
+        httpClient = createHttpClient()
 
         retrofit = Retrofit.Builder()
                 .baseUrl(NetInvoker.DOMAIN)

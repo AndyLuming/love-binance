@@ -3,6 +3,7 @@ package com.devils.binance.activity.main
 import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.util.Log
+import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.LinearLayout
@@ -23,10 +24,11 @@ class MarketAdapter(context: Context, market :String) : RecyclerView.Adapter<Rec
     private val mMarket  = market
     private val dm = DecimalFormat("#.##")
 
-    public  var data : ArrayList<Product> = ArrayList()
+    private var symbols : SparseArray<String> = SparseArray()
+    private var productsData   : HashMap<String, Product> = HashMap()
 
     override fun getItemCount(): Int {
-        return data.size
+        return symbols.size()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -35,71 +37,141 @@ class MarketAdapter(context: Context, market :String) : RecyclerView.Adapter<Rec
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val vh = holder as MyViewHolder
-        val mData = data[position]
+        val mData = productsData[symbols[position]] ?: return
         if (position % 2 == 0){
             vh.itemBg?.setBackgroundColor(mContext.resources.getColor(R.color.bg_item_black))
         }else{
             vh.itemBg?.setBackgroundColor(mContext.resources.getColor(R.color.bg_item_gray))
         }
-        vh.symbol?.text = mData.symbol
-        vh.price?.text = mData.close.toString()
 
-        if (!mData.lastClose.isNullOrBlank()) {
-            try {
-                if (mData.close.toDouble() >= mData.lastClose.toDouble()) {
-                    vh.price?.setTextColor(mContext.resources.getColor(R.color.color_opt_gt))
-                } else {
-                    vh.price?.setTextColor(mContext.resources.getColor(R.color.color_opt_lt))
+        if (mData.latestTrade == null) {
+
+            vh.symbol?.text = mData.symbol
+            vh.price?.text = mData.close.toString()
+
+//            if (!mData.lastClose.isNullOrBlank()) {
+//                try {
+//                    if (mData.close.toDouble() >= mData.lastClose.toDouble()) {
+//                        vh.price?.setTextColor(mContext.resources.getColor(R.color.color_opt_gt))
+//                    } else {
+//                        vh.price?.setTextColor(mContext.resources.getColor(R.color.color_opt_lt))
+//                    }
+//                    vh.price?.postDelayed({
+//                        vh.price?.setTextColor(mContext.resources.getColor(R.color.white))
+//                    }, 1000)
+//                } catch (e: Exception) {
+//                    Log.e(MarketAdapter::javaClass.name, e.toString())
+//                }
+//            }
+
+            val tmt = dm.format(mData.tradedMoney) + " " + mMarket
+            vh.tradeAmount?.text = tmt
+
+            val bdClose = BigDecimal(mData.close)
+            val bdOpen = BigDecimal(mData.open)
+
+            val change = bdClose.subtract(bdOpen)
+
+            var placeholder = ""
+            if (change.toDouble() < 0) {
+                vh.changeAmount?.setTextColor(mContext.resources.getColor(R.color.color_opt_lt))
+                vh.changePercent?.setTextColor(mContext.resources.getColor(R.color.color_opt_lt))
+            } else if (change.toDouble() > 0){
+                vh.changeAmount?.setTextColor(mContext.resources.getColor(R.color.color_opt_gt))
+                vh.changePercent?.setTextColor(mContext.resources.getColor(R.color.color_opt_gt))
+                placeholder = "+"
+            }
+
+            val changeAmtStr = placeholder + change.toPlainString()
+            vh.changeAmount?.text = changeAmtStr
+
+            val bdPrevClose = BigDecimal(mData.prevClose)
+            if (bdPrevClose.toDouble() > 0) {
+                val changePct = change.div(bdPrevClose).multiply(BigDecimal("100"))
+                var pctStr = dm.format(changePct) + "%"
+                if (changePct.toDouble() > 0) {
+                    pctStr = "+" + pctStr
                 }
-                vh.price?.postDelayed({
-                    vh.price?.setTextColor(mContext.resources.getColor(R.color.white))
-                }, 1000)
-            }catch (e : Exception) {
-                Log.e(MarketAdapter::javaClass.name, e.toString())
+                vh.changePercent?.text = pctStr
             }
-        }
+        }else{
 
-        val tmt = dm.format(mData.tradedMoney) + " " + mMarket
-        vh.tradeAmount?.text = tmt
+            vh.symbol?.text = mData.symbol
+            vh.price?.text = BigDecimal(mData.latestTrade.price).toPlainString()
 
-        val bdClose = BigDecimal(mData.close)
-        val bdOpen  = BigDecimal(mData.open)
-
-        val change = bdClose.subtract(bdOpen)
-
-        var placeholder = ""
-        if (change.toDouble() < 0) {
-            vh.changeAmount?.setTextColor(mContext.resources.getColor(R.color.color_opt_lt))
-            vh.changePercent?.setTextColor(mContext.resources.getColor(R.color.color_opt_lt))
-        } else {
-            vh.changeAmount?.setTextColor(mContext.resources.getColor(R.color.color_opt_gt))
-            vh.changePercent?.setTextColor(mContext.resources.getColor(R.color.color_opt_gt))
-            placeholder = "+"
-        }
-
-        val changeAmtStr = placeholder + change.toPlainString()
-        vh.changeAmount?.text = changeAmtStr
-
-        val bdPrevClose = BigDecimal(mData.prevClose)
-        if (bdPrevClose.toDouble() > 0) {
-            val changePct = change.div(bdPrevClose).multiply(BigDecimal("100"))
-            var pctStr = dm.format(changePct) + "%"
-            if (changePct.toDouble() > 0) {
-                pctStr = "+" + pctStr
+            if (mData.latestTrade.priceChange.toDouble() >= 0) {
+                val text = "+" + mData.latestTrade.priceChange
+                vh.changeAmount?.text = text
+            }else{
+                vh.changeAmount?.text = mData.latestTrade.priceChange
             }
-            vh.changePercent?.text = pctStr
+            if (mData.latestTrade.percentChange.toDouble() >= 0) {
+                val text = "+" + dm.format(mData.latestTrade.percentChange.toDouble()) + "%"
+                vh.changePercent?.text =  text
+            }else{
+                val text = dm.format(mData.latestTrade.percentChange.toDouble()) + "%"
+                vh.changePercent?.text =  text
+            }
+            val amountStr = dm.format(mData.latestTrade.quantity.toDouble()) + " " + mMarket
+            vh.tradeAmount?.text = amountStr
+
+            if (mData.latestTrade.percentChange.toDouble() >= 0){
+                vh.changeAmount?.setTextColor(mContext.resources.getColor(R.color.color_opt_gt))
+                vh.changePercent?.setTextColor(mContext.resources.getColor(R.color.color_opt_gt))
+            }else{
+                vh.changeAmount?.setTextColor(mContext.resources.getColor(R.color.color_opt_lt))
+                vh.changePercent?.setTextColor(mContext.resources.getColor(R.color.color_opt_lt))
+            }
+
+            if (!mData.isUpdate) {
+                try {
+                    when {
+                        mData.latestTrade.price.toDouble() > mData.close.toDouble() -> {
+                            vh.price?.setTextColor(mContext.resources.getColor(R.color.color_opt_gt))
+                            vh.price?.postDelayed({
+                                vh.price?.setTextColor(mContext.resources.getColor(R.color.white))
+                            }, 1000)
+                        }
+                        mData.latestTrade.price.toDouble() < mData.close.toDouble() -> {
+                            vh.price?.setTextColor(mContext.resources.getColor(R.color.color_opt_lt))
+                            vh.price?.postDelayed({
+                                vh.price?.setTextColor(mContext.resources.getColor(R.color.white))
+                            }, 1000)
+                        }
+                        else -> vh.price?.setTextColor(mContext.resources.getColor(R.color.white))
+                    }
+
+                } catch (e: Exception) {
+                    Log.e(MarketAdapter::javaClass.name, e.toString())
+                }
+                mData.isUpdate = true
+            }
+
+            mData.close = mData.latestTrade.price
+
         }
     }
 
-    fun updateTrade(trade: Trade) : Int{
-        for ((index, product) in data.withIndex()){
-            if (product.symbol == trade.s){
-                product.lastClose = product.close
-                product.close = trade.p
-                return index
+    fun updateTrade(trades: List<Trade>?) : Int{
+        if (trades != null && trades.isNotEmpty()){
+            trades.forEach({
+                productsData[it.symbol]?.latestTrade = it
+                productsData[it.symbol]?.isUpdate = false
+            })
+        }
+
+        return -1
+    }
+
+    fun setDataList(products : List<Product>?){
+        if (products != null && products.isNotEmpty()){
+            symbols.clear()
+            productsData.clear()
+            for ((index, prod) in products.withIndex()) {
+                symbols.put(index, prod.symbol)
+                productsData.put(prod.symbol, prod)
             }
         }
-        return -1
     }
 
     inner class MyViewHolder(parent: ViewGroup)

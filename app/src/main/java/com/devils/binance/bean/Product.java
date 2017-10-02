@@ -82,6 +82,10 @@ public class Product {
 
     private String lastClose;
 
+    private Trade  latestTrade;
+
+    private boolean update;
+
     public String getQuoteAsset() {
         return quoteAsset;
     }
@@ -272,5 +276,21 @@ public class Product {
 
     public void setLastClose(String lastClose) {
         this.lastClose = lastClose;
+    }
+
+    public Trade getLatestTrade() {
+        return latestTrade;
+    }
+
+    public void setLatestTrade(Trade latestTrade) {
+        this.latestTrade = latestTrade;
+    }
+
+    public boolean isUpdate() {
+        return update;
+    }
+
+    public void setUpdate(boolean update) {
+        this.update = update;
     }
 }

@@ -11,17 +11,21 @@ import android.widget.Toast
 import com.devils.binance.App
 import com.devils.binance.R
 import com.devils.binance.base.BaseActivity
+import com.devils.binance.bean.Product
 import com.devils.binance.bean.Trade
 import com.devils.binance.data.ProductRespository
 import com.devils.binance.net.NetCallback
 import com.devils.binance.net.model.ProductsList
 import com.devils.binance.widgets.ProgressView
+import com.google.gson.reflect.TypeToken
 import com.ysst.consultant.base.fragment.BaseFragment
 import okhttp3.Request
 import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import okio.ByteString
+
+
 
 
 
@@ -44,6 +48,8 @@ class MarketFragment : BaseFragment() {
     private val progress : ProgressView by lazy { ProgressView(mContext) }
     private val repo = ProductRespository()
 
+    private var mMarketListener : MarketListener? = null
+
     override fun setUpViews(root: View, savedInstanceState: Bundle?) {
         with(root){
             refreshLayout = findViewById(R.id.refreshLayout)
@@ -62,15 +68,19 @@ class MarketFragment : BaseFragment() {
     }
 
     override fun work(savedInstanceState: Bundle?) {
+        if (mMarketListener == null){
+            mMarketListener = MarketListener()
+        }
         progress.show()
         repo.fetchData(object : NetCallback<ProductsList>{
 
             override fun onSuccess(result: ProductsList?) {
                 progress.dismiss()
                 if (result?.data != null){
-                    adapter.data.clear()
+                    val filters = ArrayList<Product>()
                     result.data.filter { marketName == it.quoteAsset }
-                            .forEach { adapter.data.add(it) }
+                            .forEach { filters.add(it) }
+                    adapter.setDataList(filters)
                     adapter.notifyDataSetChanged()
                     val mlr = MarketListener()
                     mlr.run()
@@ -89,7 +99,7 @@ class MarketFragment : BaseFragment() {
 
         fun run() {
             val request = Request.Builder()
-                    .url("wss://stream.binance.com:9443/ws/bnbbtc@aggTrade")
+                    .url("wss://stream2.binance.com:9443/ws/!ticker@arr")
                     .addHeader("Connection", "keep-alive")
                     .build()
             App.INSTANCE.httpClient.newWebSocket(request, this)
@@ -109,17 +119,14 @@ class MarketFragment : BaseFragment() {
         }
 
         override fun onMessage(webSocket: WebSocket?, text: String?) {
+            Log.i("webss", text)
             try {
-                val trade = App.INSTANCE.gson.fromJson<Trade>(text, Trade::class.java)
-                (mContext as BaseActivity).runOnUiThread(object : Runnable{
-                    override fun run() {
-                        val position = adapter.updateTrade(trade)
-                        if (position >= 0){
-                            adapter.notifyItemChanged(position)
-                        }
-                    }
-                })
-                Log.i("webss", trade.toString())
+                val listType = object : TypeToken<ArrayList<Trade>>(){}.type
+                val trade = App.INSTANCE.gson.fromJson<List<Trade>>(text, listType)
+                (mContext as BaseActivity).runOnUiThread {
+                    adapter.updateTrade(trade)
+                    adapter.notifyDataSetChanged()
+                }
             }catch (e : Exception) {
                 Log.e("webss", e.toString())
             }

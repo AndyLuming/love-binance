@@ -28,8 +28,8 @@ import okio.ByteString
 
 class MarketFragment : BaseFragment() {
 
-    @JvmField val API_KEY = "tnjMgffaGXNbDMMzAJM1lcda2WVeU6VALHUSIqZrPOfJw9jlrCd1pvQbyreJlXJV"
-    @JvmField val SEC_KEY = "TWoH08dALLgl5CH1vNk0XGuehtUmgs8fyXrHWtGuW9kxvw0L7ZLegUuB9QxKEb6j"
+    @JvmField val API_KEY = "awiuncpoijhvufnvjnvjkndfivfnjkvnfjfjuioio"
+    @JvmField val SEC_KEY = "ajwhdiuahdaaoidjuwaijduiadhyuevfsbjncqwie"
 
     override val layoutResId: Int
         get() = R.layout.fragment_market

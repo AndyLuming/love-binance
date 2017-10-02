@@ -27,6 +27,7 @@ class App : Application() {
     }
 
     lateinit var gson: Gson
+    lateinit var httpClient : OkHttpClient
     lateinit var retrofit: Retrofit
 
     override fun onCreate() {
@@ -71,7 +72,7 @@ class App : Application() {
         val logInterceptor = HttpLoggingInterceptor()
         logInterceptor.level = HttpLoggingInterceptor.Level.BODY
 
-        val okHttp = OkHttpClient.Builder()
+        httpClient = OkHttpClient.Builder()
                 .sslSocketFactory(sslContext.socketFactory)
                 .hostnameVerifier(org.apache.http.conn.ssl.SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER)
                 .readTimeout(60, TimeUnit.SECONDS)
@@ -83,7 +84,7 @@ class App : Application() {
                 .baseUrl(NetInvoker.DOMAIN)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create(gson))
-                .client(okHttp)
+                .client(httpClient)
                 .build()
 
     }

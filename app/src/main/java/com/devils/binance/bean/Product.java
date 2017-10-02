@@ -80,6 +80,8 @@ public class Product {
     @SerializedName("matchingUnitType")
     private String matchingUnitType;
 
+    private String lastClose;
+
     public String getQuoteAsset() {
         return quoteAsset;
     }
@@ -262,5 +264,13 @@ public class Product {
 
     public void setMatchingUnitType(String matchingUnitType) {
         this.matchingUnitType = matchingUnitType;
+    }
+
+    public String getLastClose() {
+        return lastClose;
+    }
+
+    public void setLastClose(String lastClose) {
+        this.lastClose = lastClose;
     }
 }

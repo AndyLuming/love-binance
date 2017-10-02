@@ -9,6 +9,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.devils.binance.R
 import com.devils.binance.bean.Product
+import com.devils.binance.bean.Trade
 import java.math.BigDecimal
 import java.text.DecimalFormat
 
@@ -41,7 +42,23 @@ class MarketAdapter(context: Context, market :String) : RecyclerView.Adapter<Rec
             vh.itemBg?.setBackgroundColor(mContext.resources.getColor(R.color.bg_item_gray))
         }
         vh.symbol?.text = mData.symbol
-        vh.price?.text  = mData.close.toString()
+        vh.price?.text = mData.close.toString()
+
+        if (!mData.lastClose.isNullOrBlank()) {
+            try {
+                if (mData.close.toDouble() >= mData.lastClose.toDouble()) {
+                    vh.price?.setTextColor(mContext.resources.getColor(R.color.color_opt_gt))
+                } else {
+                    vh.price?.setTextColor(mContext.resources.getColor(R.color.color_opt_lt))
+                }
+                vh.price?.postDelayed({
+                    vh.price?.setTextColor(mContext.resources.getColor(R.color.white))
+                }, 1000)
+            }catch (e : Exception) {
+                Log.e(MarketAdapter::javaClass.name, e.toString())
+            }
+        }
+
         val tmt = dm.format(mData.tradedMoney) + " " + mMarket
         vh.tradeAmount?.text = tmt
 
@@ -50,7 +67,6 @@ class MarketAdapter(context: Context, market :String) : RecyclerView.Adapter<Rec
 
         val change = bdClose.subtract(bdOpen)
 
-        Log.i("", change.toString())
         var placeholder = ""
         if (change.toDouble() < 0) {
             vh.changeAmount?.setTextColor(mContext.resources.getColor(R.color.color_opt_lt))
@@ -72,9 +88,18 @@ class MarketAdapter(context: Context, market :String) : RecyclerView.Adapter<Rec
                 pctStr = "+" + pctStr
             }
             vh.changePercent?.text = pctStr
-        }else{
-
         }
+    }
+
+    fun updateTrade(trade: Trade) : Int{
+        for ((index, product) in data.withIndex()){
+            if (product.symbol == trade.s){
+                product.lastClose = product.close
+                product.close = trade.p
+                return index
+            }
+        }
+        return -1
     }
 
     inner class MyViewHolder(parent: ViewGroup)

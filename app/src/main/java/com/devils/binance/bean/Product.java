@@ -69,10 +69,10 @@ public class Product {
     private float tradedMoney;
     @Expose
     @SerializedName("high")
-    private float high;
+    private String high;
     @Expose
     @SerializedName("low")
-    private float low;
+    private String low;
     @Expose
     @SerializedName("tickSize")
     private float tickSize;
@@ -238,19 +238,19 @@ public class Product {
         this.tradedMoney = tradedMoney;
     }
 
-    public double getHigh() {
+    public String getHigh() {
         return high;
     }
 
-    public void setHigh(float high) {
+    public void setHigh(String high) {
         this.high = high;
     }
 
-    public double getLow() {
+    public String getLow() {
         return low;
     }
 
-    public void setLow(float low) {
+    public void setLow(String low) {
         this.low = low;
     }
 

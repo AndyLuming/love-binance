@@ -4,4 +4,14 @@
     <string name="eth_market">ETH Market</string>
     <string name="usdt_market">USDT Market</string>
     <string name="twenty_four_hour_trade_amount">24小时成交额</string>
+    <string name="buy">买入</string>
+    <string name="sell">卖出</string>
+    <string name="latest_trade">最新成交</string>
+    <string name="price">价格</string>
+    <string name="count">数量</string>
+    <string name="time">时间</string>
+    <string name="low_price">24小时最低价</string>
+    <string name="trade_amount">24小时成交额</string>
+    <string name="high_price">24小时最高价</string>
+    <string name="percent_change">24小时涨跌</string>
 </resources>

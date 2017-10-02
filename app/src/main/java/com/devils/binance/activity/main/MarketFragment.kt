@@ -50,6 +50,8 @@ class MarketFragment : BaseFragment() {
 
     private var mMarketListener : MarketListener? = null
 
+    private var isLoading = false
+
     override fun setUpViews(root: View, savedInstanceState: Bundle?) {
         with(root){
             refreshLayout = findViewById(R.id.refreshLayout)
@@ -71,39 +73,69 @@ class MarketFragment : BaseFragment() {
         if (mMarketListener == null){
             mMarketListener = MarketListener()
         }
+        if (isLoading) return
+        isLoading = true
         progress.show()
         repo.fetchData(object : NetCallback<ProductsList>{
 
             override fun onSuccess(result: ProductsList?) {
                 progress.dismiss()
+                isLoading = false
                 if (result?.data != null){
                     val filters = ArrayList<Product>()
                     result.data.filter { marketName == it.quoteAsset }
                             .forEach { filters.add(it) }
                     adapter.setDataList(filters)
                     adapter.notifyDataSetChanged()
-                    val mlr = MarketListener()
-                    mlr.run()
+                    if (mMarketListener != null && !mMarketListener!!.isRunning){
+                        mMarketListener?.run()
+                    }
                 }
             }
 
             override fun onError(message: String?) {
                 progress.dismiss()
+                isLoading = false
                 Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
             }
 
         })
     }
 
+//    override fun onResume() {
+//        super.onResume()
+//        if (adapter.itemCount > 1 && !isLoading
+//                && mMarketListener != null && !mMarketListener!!.isRunning){
+//            mMarketListener?.run()
+//        }
+//    }
+//
+//    override fun onStop() {
+//        mMarketListener?.stop()
+//        super.onStop()
+//    }
+
     inner class MarketListener : WebSocketListener() {
 
+        var isRunning = false
+        var mWebSocket : WebSocket? = null
+
         fun run() {
+            Log.i("MarketListener", "run")
             val request = Request.Builder()
                     .url("wss://stream2.binance.com:9443/ws/!ticker@arr")
                     .addHeader("Connection", "keep-alive")
                     .build()
-            App.INSTANCE.httpClient.newWebSocket(request, this)
+            mWebSocket = App.INSTANCE.httpClient.newWebSocket(request, this)
             App.INSTANCE.httpClient.dispatcher().executorService().shutdown()
+            isRunning = true
+        }
+
+        fun stop() {
+            Log.i("MarketListener", "stop")
+            mWebSocket?.close(1000, "closed")
+            mWebSocket?.cancel()
+            isRunning = false
         }
 
         override fun onOpen(webSocket: WebSocket?, response: Response?) {

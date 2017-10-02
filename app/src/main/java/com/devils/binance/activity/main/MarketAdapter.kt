@@ -1,6 +1,7 @@
 package com.devils.binance.activity.main
 
 import android.content.Context
+import android.content.Intent
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.util.SparseArray
@@ -9,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.devils.binance.R
+import com.devils.binance.activity.trade.TradeActivity
 import com.devils.binance.bean.Product
 import com.devils.binance.bean.Trade
 import java.math.BigDecimal
@@ -48,21 +50,6 @@ class MarketAdapter(context: Context, market :String) : RecyclerView.Adapter<Rec
 
             vh.symbol?.text = mData.symbol
             vh.price?.text = mData.close.toString()
-
-//            if (!mData.lastClose.isNullOrBlank()) {
-//                try {
-//                    if (mData.close.toDouble() >= mData.lastClose.toDouble()) {
-//                        vh.price?.setTextColor(mContext.resources.getColor(R.color.color_opt_gt))
-//                    } else {
-//                        vh.price?.setTextColor(mContext.resources.getColor(R.color.color_opt_lt))
-//                    }
-//                    vh.price?.postDelayed({
-//                        vh.price?.setTextColor(mContext.resources.getColor(R.color.white))
-//                    }, 1000)
-//                } catch (e: Exception) {
-//                    Log.e(MarketAdapter::javaClass.name, e.toString())
-//                }
-//            }
 
             val tmt = dm.format(mData.tradedMoney) + " " + mMarket
             vh.tradeAmount?.text = tmt
@@ -148,7 +135,12 @@ class MarketAdapter(context: Context, market :String) : RecyclerView.Adapter<Rec
             }
 
             mData.close = mData.latestTrade.price
-
+        }
+        vh.itemView.setOnClickListener{
+            val intent = Intent(mContext, TradeActivity::class.java)
+            intent.putExtra("symbol", mData.symbol)
+            intent.putExtra("market", mMarket)
+            mContext.startActivity(intent)
         }
     }
 

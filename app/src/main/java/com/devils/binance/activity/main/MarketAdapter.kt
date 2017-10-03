@@ -29,6 +29,9 @@ class MarketAdapter(context: Context, market :String) : RecyclerView.Adapter<Rec
     private var symbols : SparseArray<String> = SparseArray()
     private var productsData   : HashMap<String, Product> = HashMap()
 
+    var cnyUsdRate = 0.0
+    var marketUsdtRate = 0.0
+
     override fun getItemCount(): Int {
         return symbols.size()
     }
@@ -49,7 +52,18 @@ class MarketAdapter(context: Context, market :String) : RecyclerView.Adapter<Rec
         if (mData.latestTrade == null) {
 
             vh.symbol?.text = mData.symbol
-            vh.price?.text = mData.close.toString()
+            if (mMarket == "USDT") {
+                vh.price?.text = dm.format(mData.close.toDouble())
+            }else{
+                vh.price?.text = mData.close.toString()
+            }
+
+            var cny = BigDecimal(mData.close).multiply(BigDecimal(cnyUsdRate))
+            if (mMarket != "USDT"){
+                cny = cny.multiply(BigDecimal(marketUsdtRate))
+            }
+            val cnyStr = "￥" + dm.format(cny)
+            vh.cny?.text = cnyStr
 
             val tmt = dm.format(mData.tradedMoney) + " " + mMarket
             vh.tradeAmount?.text = tmt
@@ -57,7 +71,7 @@ class MarketAdapter(context: Context, market :String) : RecyclerView.Adapter<Rec
             val bdClose = BigDecimal(mData.close)
             val bdOpen = BigDecimal(mData.open)
 
-            val change = bdClose.subtract(bdOpen)
+            var change = bdClose.subtract(bdOpen)
 
             var placeholder = ""
             if (change.toDouble() < 0) {
@@ -69,8 +83,13 @@ class MarketAdapter(context: Context, market :String) : RecyclerView.Adapter<Rec
                 placeholder = "+"
             }
 
-            val changeAmtStr = placeholder + change.toPlainString()
-            vh.changeAmount?.text = changeAmtStr
+            if (mMarket == "USDT") {
+                val changeAmtStr = placeholder + dm.format(change.toDouble())
+                vh.changeAmount?.text = changeAmtStr
+            }else {
+                val changeAmtStr = placeholder + change.toPlainString()
+                vh.changeAmount?.text = changeAmtStr
+            }
 
             val bdPrevClose = BigDecimal(mData.prevClose)
             if (bdPrevClose.toDouble() > 0) {
@@ -84,14 +103,36 @@ class MarketAdapter(context: Context, market :String) : RecyclerView.Adapter<Rec
         }else{
 
             vh.symbol?.text = mData.symbol
-            vh.price?.text = BigDecimal(mData.latestTrade.price).toPlainString()
+
+            if (mMarket == "USDT") {
+                vh.price?.text = dm.format(mData.latestTrade.price.toDouble())
+            }else{
+                vh.price?.text = mData.latestTrade.price
+            }
+
+            var cny = BigDecimal(mData.latestTrade.price).multiply(BigDecimal(cnyUsdRate))
+            if (mMarket != "USDT"){
+                cny = cny.multiply(BigDecimal(marketUsdtRate))
+            }
+            val cnyStr = "￥" + dm.format(cny)
+            vh.cny?.text = cnyStr
 
             if (mData.latestTrade.priceChange.toDouble() >= 0) {
-                val text = "+" + mData.latestTrade.priceChange
-                vh.changeAmount?.text = text
+                if (mMarket == "USDT"){
+                    val text = "+" + dm.format(mData.latestTrade.priceChange.toDouble())
+                    vh.changeAmount?.text = text
+                }else {
+                    val text = "+" + mData.latestTrade.priceChange
+                    vh.changeAmount?.text = text
+                }
             }else{
-                vh.changeAmount?.text = mData.latestTrade.priceChange
+                if (mMarket == "USDT"){
+                    vh.changeAmount?.text = dm.format(mData.latestTrade.priceChange.toDouble())
+                }else {
+                    vh.changeAmount?.text = mData.latestTrade.priceChange
+                }
             }
+
             if (mData.latestTrade.percentChange.toDouble() >= 0) {
                 val text = "+" + dm.format(mData.latestTrade.percentChange.toDouble()) + "%"
                 vh.changePercent?.text =  text
@@ -169,12 +210,13 @@ class MarketAdapter(context: Context, market :String) : RecyclerView.Adapter<Rec
     inner class MyViewHolder(parent: ViewGroup)
         : RecyclerView.ViewHolder(LayoutInflater.from(mContext).inflate(R.layout.viewholder_market, parent, false)) {
 
-        public var itemBg           : LinearLayout? = null
-        public var symbol           : TextView?     = null
-        public var changeAmount     : TextView?     = null
-        public var changePercent    : TextView?     = null
-        public var price            : TextView?     = null
-        public var tradeAmount      : TextView?     = null
+        var itemBg           : LinearLayout? = null
+        var symbol           : TextView?     = null
+        var changeAmount     : TextView?     = null
+        var changePercent    : TextView?     = null
+        var price            : TextView?     = null
+        var cny              : TextView? = null
+        var tradeAmount      : TextView?     = null
 
         init {
             with(itemView){
@@ -183,6 +225,7 @@ class MarketAdapter(context: Context, market :String) : RecyclerView.Adapter<Rec
                 changeAmount    = findViewById(R.id.changeAmount)
                 changePercent   = findViewById(R.id.changePercent)
                 price           = findViewById(R.id.price)
+                cny             = findViewById(R.id.cny)
                 tradeAmount     = findViewById(R.id.tradeAmount)
             }
         }

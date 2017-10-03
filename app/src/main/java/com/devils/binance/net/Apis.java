@@ -1,5 +1,6 @@
 package com.devils.binance.net;
 
+import com.devils.binance.bean.CnyUsd;
 import com.devils.binance.net.model.ProductsList;
 
 import io.reactivex.Observable;
@@ -15,5 +16,8 @@ public interface Apis {
 
     @GET("/exchange/public/product")
     Observable<Result<ProductsList>> fetchData();
+
+    @GET("/exchange/public/cnyusd")
+    Observable<Result<CnyUsd>> cnyUsd();
 
 }

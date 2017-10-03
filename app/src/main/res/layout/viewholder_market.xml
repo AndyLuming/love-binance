@@ -23,7 +23,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:textColor="@color/white"
-            android:text="ETHBTC"/>
+            android:text="--"/>
 
         <TextView
             android:id="@+id/changeAmount"
@@ -31,9 +31,11 @@
             android:layout_height="wrap_content"
             android:textSize="14sp"
             android:textColor="@color/color_opt_gt"
+            android:layout_marginLeft="0dp"
+            android:layout_marginStart="0dp"
             android:layout_marginRight="16dp"
             android:layout_marginEnd="16dp"
-            android:text="+0.0001408"/>
+            android:text="--"/>
 
         <TextView
             android:id="@+id/changePercent"
@@ -41,7 +43,7 @@
             android:layout_height="wrap_content"
             android:textSize="14sp"
             android:textColor="@color/color_opt_gt"
-            android:text="+3.03%"/>
+            android:text="--"/>
 
     </LinearLayout>
 
@@ -53,18 +55,35 @@
 
         <TextView
             android:id="@+id/price"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:textSize="14sp"
             android:textColor="@color/white"
-            android:text="0.00030453"/>
+            android:layout_marginLeft="0dp"
+            android:layout_marginStart="0dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginEnd="8dp"
+            android:text="--"/>
+
+        <TextView
+            android:id="@+id/cny"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:text="--"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/gray"
             android:text="@string/twenty_four_hour_trade_amount"
+            android:layout_marginLeft="0dp"
+            android:layout_marginStart="0dp"
             android:layout_marginRight="7dp"
             android:layout_marginEnd="7dp"
             android:textSize="14sp"/>
@@ -75,7 +94,7 @@
             android:layout_height="wrap_content"
             android:textColor="@color/gray"
             android:textSize="14sp"
-            android:text="1226.82 BTC"/>
+            android:text="--"/>
 
     </LinearLayout>
 

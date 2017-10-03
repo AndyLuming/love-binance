@@ -8,7 +8,7 @@ import android.widget.Toast
 import com.devils.binance.R
 import com.devils.binance.base.BaseActivity
 import com.devils.binance.bean.Product
-import com.devils.binance.data.ProductRespository
+import com.devils.binance.data.dataRepository
 import com.devils.binance.net.NetCallback
 import com.devils.binance.net.model.ProductsList
 import com.devils.binance.widgets.ProgressView
@@ -17,7 +17,7 @@ import java.text.DecimalFormat
 
 class TradeActivity : BaseActivity() {
 
-    private val repo = ProductRespository()
+    private val repo = dataRepository()
     private val progress : ProgressView by lazy { ProgressView(this) }
     private var isLoading = false
     private var symbolText = ""

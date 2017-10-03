@@ -71,7 +71,7 @@ class MarketAdapter(context: Context, market :String) : RecyclerView.Adapter<Rec
             val bdClose = BigDecimal(mData.close)
             val bdOpen = BigDecimal(mData.open)
 
-            var change = bdClose.subtract(bdOpen)
+            val change = bdClose.subtract(bdOpen)
 
             var placeholder = ""
             if (change.toDouble() < 0) {

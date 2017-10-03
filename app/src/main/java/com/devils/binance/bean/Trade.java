@@ -3,12 +3,14 @@ package com.devils.binance.bean;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
+
 /**
  * Created by AndyL on 2017/10/2.
  *
  */
 
-public class Trade {
+public class Trade implements Serializable{
 
 
     /**

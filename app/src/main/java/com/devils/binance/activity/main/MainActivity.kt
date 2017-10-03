@@ -1,5 +1,6 @@
 package com.devils.binance.activity.main
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -8,6 +9,7 @@ import android.widget.TextView
 import android.widget.Toast
 import com.devils.binance.App
 import com.devils.binance.R
+import com.devils.binance.activity.search.SearchActivity
 import com.devils.binance.base.BaseActivity
 import com.devils.binance.bean.CnyUsd
 import com.devils.binance.bean.Product
@@ -81,6 +83,12 @@ class MainActivity : BaseActivity() {
         tabUsdt?.setOnClickListener {
             setCurrentTab(2)
             replaceMarket("USDT")
+        }
+
+        findViewById<View>(R.id.search).setOnClickListener{
+            val intent = Intent(this@MainActivity, SearchActivity::class.java)
+            intent.putExtra("data", dataCache)
+            startActivity(intent)
         }
     }
 

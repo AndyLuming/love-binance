@@ -3,12 +3,14 @@ package com.devils.binance.bean;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
+
 /**
  * Created by AndyL on 2017/10/1.
  *
  */
 
-public class Product {
+public class Product implements Serializable{
 
     @Expose
     @SerializedName("quoteAsset")

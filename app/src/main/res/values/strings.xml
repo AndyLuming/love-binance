@@ -14,4 +14,7 @@
     <string name="trade_amount">24小时成交额</string>
     <string name="high_price">24小时最高价</string>
     <string name="percent_change">24小时涨跌</string>
+    <string name="search_tip">请输入关键字搜索</string>
+    <string name="cancel">取消</string>
+    <string name="search_result">搜索结果:</string>
 </resources>

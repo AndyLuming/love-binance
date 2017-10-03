@@ -11,6 +11,21 @@
         android:layout_width="match_parent"
         android:layout_height="45dp">
 
+        <ImageView
+            android:id="@+id/pin"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:src="@drawable/pin"
+            android:scaleType="centerInside"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:paddingLeft="16dp"
+            android:paddingStart="16dp"
+            android:paddingRight="16dp"
+            android:paddingEnd="16dp"/>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

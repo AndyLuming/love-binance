@@ -48,6 +48,8 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity android:name=".activity.custom.CustomActivity" />
+        <activity android:name=".activity.custommarket.CustomMarketActivity"></activity>
     </application>
 
 </manifest>

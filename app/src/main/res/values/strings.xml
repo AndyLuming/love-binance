@@ -17,4 +17,7 @@
     <string name="search_tip">请输入关键字搜索</string>
     <string name="cancel">取消</string>
     <string name="search_result">搜索结果:</string>
+    <string name="custom_market">自选行情</string>
+    <string name="confirm">确定</string>
+    <string name="edit">编辑</string>
 </resources>

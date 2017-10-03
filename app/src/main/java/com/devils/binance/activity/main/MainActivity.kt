@@ -9,6 +9,7 @@ import android.widget.TextView
 import android.widget.Toast
 import com.devils.binance.App
 import com.devils.binance.R
+import com.devils.binance.activity.custommarket.CustomMarketActivity
 import com.devils.binance.activity.search.SearchActivity
 import com.devils.binance.base.BaseActivity
 import com.devils.binance.bean.CnyUsd
@@ -54,10 +55,13 @@ class MainActivity : BaseActivity() {
     private var currentMarket = "BTC"
 
     private var dataCache : ArrayList<Product> = ArrayList()
+
     private var rate = 0.0
 
     private var btcUsdtRate = 0.0
     private var ethUsdtRate = 0.0
+
+    private var mNowCustomMarket = HashMap<String, Boolean>()
 
     override fun setUpViews(savedInstanceState: Bundle?) {
         tabBtc = findViewById(R.id.tabBtc)
@@ -83,6 +87,15 @@ class MainActivity : BaseActivity() {
         tabUsdt?.setOnClickListener {
             setCurrentTab(2)
             replaceMarket("USDT")
+        }
+
+        findViewById<View>(R.id.pin).setOnClickListener{
+            val intent = Intent(this@MainActivity, CustomMarketActivity::class.java)
+            intent.putExtra("data", dataCache)
+            intent.putExtra("cnyRate", rate)
+            intent.putExtra("ethRate", ethUsdtRate)
+            intent.putExtra("btcRate", btcUsdtRate)
+            startActivity(intent)
         }
 
         findViewById<View>(R.id.search).setOnClickListener{

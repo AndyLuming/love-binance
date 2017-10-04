@@ -20,4 +20,5 @@
     <string name="custom_market">自选行情</string>
     <string name="confirm">确定</string>
     <string name="edit">编辑</string>
+    <string name="k_line">K线图</string>
 </resources>

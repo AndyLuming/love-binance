@@ -15,4 +15,9 @@
     <color name="bg_item_black">#151a1d</color>
     <color name="bg_item_gray">#1e2328</color>
 
+    <color name="k_line_blue">#508cd9</color>
+    <color name="k_line_yellow">#b99d10</color>
+    <color name="k_line_view_port">#2c3033</color>
+    <color name="k_line_label_color">#4e5254</color>
+
 </resources>

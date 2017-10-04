@@ -20,4 +20,8 @@ class dataRepository : BaseRepository(){
         return invokeRemote(NetInvoker.callApis().cnyUsd(), callback)
     }
 
+    fun kLines(symbol : String, interval : String, callback: NetCallback<List<List<String>>>) : Disposable {
+        return invokeRemote(NetInvoker.callApis().kLine(symbol, interval), callback)
+    }
+
 }

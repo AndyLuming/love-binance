@@ -4,24 +4,88 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
 
+static def releaseTime() {
+    return new Date().format("yyyy-MM-dd", TimeZone.getTimeZone("UTC"))
+}
+
 android {
+    def BOOLEAN = "boolean"
+    def TRUE = "true"
+    def FALSE = "false"
+    def OPEN_LOG = "OPEN_LOG"
+    def NET_DEBUG = "NET_DEBUG"
     compileSdkVersion 26
-    buildToolsVersion "26.0.1"
+    buildToolsVersion "26.0.2"
     defaultConfig {
         applicationId "com.devils.binance"
-        minSdkVersion 17
+        minSdkVersion 14
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
-    buildTypes {
+    signingConfigs {
+        debug {
+            storeFile file("keystore.jks")
+            storePassword "1q2w3e4r"
+            keyAlias "lovebinance"
+            keyPassword "1q2w3e4r"
+        }
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            storeFile file("keystore.jks")
+            storePassword "1q2w3e4r"
+            keyAlias "lovebinance"
+            keyPassword "1q2w3e4r"
         }
     }
+
+    buildTypes {
+        debug {
+            buildConfigField BOOLEAN, OPEN_LOG, TRUE
+            buildConfigField BOOLEAN, NET_DEBUG, FALSE
+            minifyEnabled false
+            debuggable true
+            zipAlignEnabled true
+            shrinkResources false
+            signingConfig signingConfigs.debug
+        }
+
+        release {
+            buildConfigField BOOLEAN, OPEN_LOG, FALSE
+            buildConfigField BOOLEAN, NET_DEBUG, FALSE
+
+            //是否混淆
+            minifyEnabled false
+            zipAlignEnabled true
+            // 移除无用的resource文件
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release;
+            applicationVariants.all { variant ->
+                if (variant.buildType.name == 'release' || variant.buildType.name == 'beta') {
+                    variant.outputs.all { output ->
+                        def outputFile = output.outputFile
+                        if (outputFile != null && outputFile.name.endsWith('.apk')) {
+                            def fileName = "love_binance_${defaultConfig.versionName}_${releaseTime()}_${variant.productFlavors[0].name}_${variant.buildType.name}.apk"
+                            output.outputFileName = new File(outputFile.parent, fileName)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    flavorDimensions "default"
+
+    productFlavors {
+
+        binance {
+            manifestPlaceholders = [CHANNEL_ID: "binance"]
+        }
+
+    }
+
     compileOptions {
         targetCompatibility 1.8
         sourceCompatibility 1.8

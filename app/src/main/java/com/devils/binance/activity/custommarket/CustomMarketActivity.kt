@@ -13,6 +13,7 @@ import com.devils.binance.activity.custom.CustomActivity
 import com.devils.binance.base.BaseActivity
 import com.devils.binance.bean.Product
 import com.devils.binance.bean.Trade
+import com.devils.binance.util.SharedPreferencesHelper
 import com.google.gson.reflect.TypeToken
 import okhttp3.*
 import okio.ByteString
@@ -62,10 +63,8 @@ class CustomMarketActivity : BaseActivity() {
 
         mCustomMarketObserver = CustomMarketObserver()
 
-        mNowCustomMarket.put("BNBBTC", true)
-        mNowCustomMarket.put("NEOBTC", true)
-        mNowCustomMarket.put("BNBETH", true)
-        mNowCustomMarket.put("CTRBTC", false)
+        val marketSet = SharedPreferencesHelper.getStringSet(this@CustomMarketActivity, "custom")
+        marketSet?.forEach { mNowCustomMarket.put(it, true) }
 
         if (intent != null){
             try {
@@ -109,7 +108,7 @@ class CustomMarketActivity : BaseActivity() {
         if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_FOR_CUSTOM_MARKET){
             if (data?.getSerializableExtra("customMarketData") != null){
                 try{
-                    mNowCustomMarket = data!!.getSerializableExtra("customMarketData") as HashMap<String, Boolean>
+                    mNowCustomMarket = data.getSerializableExtra("customMarketData") as HashMap<String, Boolean>
                     adapter.data.clear()
                     mData.filter {
                         mNowCustomMarket.containsKey(it.symbol) && mNowCustomMarket[it.symbol]!!
@@ -117,6 +116,15 @@ class CustomMarketActivity : BaseActivity() {
                         adapter.data.add(it)
                     }
                     adapter.notifyDataSetChanged()
+
+                    val customMarketSet = mutableSetOf<String>()
+
+                    mNowCustomMarket.forEach{ customMarketSet.add(it.key) }
+
+                    SharedPreferencesHelper.run {
+                        putStringSet(this@CustomMarketActivity,
+                                        "custom", customMarketSet)
+                    }
                 }catch (e : Exception) {
                     e.printStackTrace()
                 }

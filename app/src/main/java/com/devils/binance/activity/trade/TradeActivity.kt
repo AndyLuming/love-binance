@@ -8,10 +8,11 @@ import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import com.devils.binance.App
 import com.devils.binance.R
 import com.devils.binance.base.BaseActivity
 import com.devils.binance.bean.Product
-import com.devils.binance.data.dataRepository
+import com.devils.binance.data.DataRepository
 import com.devils.binance.net.NetCallback
 import com.devils.binance.net.model.ProductsList
 import com.devils.binance.widgets.ProgressView
@@ -34,7 +35,7 @@ class TradeActivity : BaseActivity() {
 
     @JvmField val Y_SCALE_FACTOR = "1000"
 
-    private val repo = dataRepository()
+    private val repo : DataRepository by lazy { DataRepository(application as App) }
     private val progress : ProgressView by lazy { ProgressView(this) }
     private var isLoading = false
     private var symbolText = ""

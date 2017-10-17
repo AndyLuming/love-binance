@@ -148,7 +148,7 @@ class CustomMarketActivity : BaseActivity() {
                     .url("wss://stream2.binance.com:9443/ws/!ticker@arr")
                     .addHeader("Connection", "keep-alive")
                     .build()
-            mOkHttpClient = App.INSTANCE.createHttpClient()
+            mOkHttpClient = (application as App).createHttpClient()
             mWebSocket = mOkHttpClient?.newWebSocket(request, this)
             mOkHttpClient?.dispatcher()?.executorService()?.shutdown()
             isRunning = true
@@ -179,7 +179,7 @@ class CustomMarketActivity : BaseActivity() {
             runOnUiThread {
                 try {
                     val listType = object : TypeToken<ArrayList<Trade>>(){}.type
-                    val trade = App.INSTANCE.gson.fromJson<List<Trade>>(text, listType)
+                    val trade = (application as App).gson.fromJson<List<Trade>>(text, listType)
                     for (t in trade) {
                         mData.filter { t.symbol == it.symbol }
                                 .forEach {

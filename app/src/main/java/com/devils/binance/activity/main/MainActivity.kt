@@ -15,7 +15,7 @@ import com.devils.binance.base.BaseActivity
 import com.devils.binance.bean.CnyUsd
 import com.devils.binance.bean.Product
 import com.devils.binance.bean.Trade
-import com.devils.binance.data.dataRepository
+import com.devils.binance.data.DataRepository
 import com.devils.binance.net.NetCallback
 import com.devils.binance.net.model.ProductsList
 import com.devils.binance.widgets.ProgressView
@@ -46,7 +46,7 @@ class MainActivity : BaseActivity() {
 
     private val progress : ProgressView by lazy { ProgressView(this@MainActivity) }
 
-    private val dataRepo : dataRepository by lazy { dataRepository() }
+    private val dataRepo : DataRepository by lazy { DataRepository(application as App) }
     private var mMarketObserver : MarketObserver? = null
 
     private var isLoading = false
@@ -268,7 +268,7 @@ class MainActivity : BaseActivity() {
                     .url("wss://stream2.binance.com:9443/ws/!ticker@arr")
                     .addHeader("Connection", "keep-alive")
                     .build()
-            mOkHttpClient = App.INSTANCE.createHttpClient()
+            mOkHttpClient = (application as App).createHttpClient()
             mWebSocket = mOkHttpClient?.newWebSocket(request, this)
             mOkHttpClient?.dispatcher()?.executorService()?.shutdown()
             isRunning = true
@@ -299,7 +299,7 @@ class MainActivity : BaseActivity() {
             runOnUiThread {
                 try {
                     val listType = object : TypeToken<ArrayList<Trade>>(){}.type
-                    val trade = App.INSTANCE.gson.fromJson<List<Trade>>(text, listType)
+                    val trade = (application as App).gson.fromJson<List<Trade>>(text, listType)
                     for (t in trade) {
                         dataCache.filter { t.symbol == it.symbol }
                                 .forEach { it.latestTrade = t }

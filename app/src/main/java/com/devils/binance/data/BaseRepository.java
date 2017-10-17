@@ -2,6 +2,7 @@ package com.devils.binance.data;
 
 import android.support.annotation.NonNull;
 
+import com.devils.binance.App;
 import com.devils.binance.net.NetCallback;
 
 import io.reactivex.Observable;
@@ -19,9 +20,11 @@ import retrofit2.adapter.rxjava2.Result;
 
 public class BaseRepository {
 
+    protected final App mApp;
     private final CompositeDisposable compositeDisposable;
 
-    public BaseRepository() {
+    public BaseRepository(App app) {
+        mApp = app;
         this.compositeDisposable = new CompositeDisposable();
     }
 

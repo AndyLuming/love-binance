@@ -22,17 +22,12 @@ import javax.security.cert.CertificateException
  */
 class App : Application() {
 
-    companion object {
-        lateinit var INSTANCE : App
-    }
-
     lateinit var gson: Gson
     lateinit var httpClient : OkHttpClient
     lateinit var retrofit: Retrofit
 
     override fun onCreate() {
         super.onCreate()
-        INSTANCE = this
         initGson()
         initRetrofit()
     }

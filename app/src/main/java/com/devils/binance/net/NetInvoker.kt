@@ -10,10 +10,15 @@ object NetInvoker {
 
     @JvmField val DOMAIN = "https://www.binance.com"
 
-    private val apiList : Apis by lazy {
-        App.INSTANCE.retrofit.create(Apis::class.java)
+    private var apiList : Apis? = null
+
+    private fun getApiList(app: App) : Apis {
+        if (apiList == null){
+            apiList = app.retrofit.create(Apis::class.java)
+        }
+        return apiList!!
     }
 
-    fun callApis() = apiList
+    fun callApis(app: App) = getApiList(app)
 
 }

@@ -16,8 +16,7 @@ import com.devils.binance.bean.Trade
 import com.devils.binance.common.Constants
 import com.devils.binance.util.SharedPreferencesHelper
 import com.google.gson.reflect.TypeToken
-import okhttp3.*
-import okio.ByteString
+import okhttp3.WebSocket
 
 class CustomMarketActivity : BaseActivity() {
 
@@ -62,7 +61,33 @@ class CustomMarketActivity : BaseActivity() {
 
     override fun work(savedInstanceState: Bundle?) {
 
-        mCustomMarketObserver = CustomMarketObserver()
+        mCustomMarketObserver = CustomMarketObserver((application as App), "wss://stream2.binance.com:9443/ws/!ticker@arr",
+                object : CustomMarketObserver.CustomMarketObserverWatcher {
+                    override fun onReceiveMessage(webSocket: WebSocket?, text: String?) {
+                        runOnUiThread {
+                            try {
+                                val listType = object : TypeToken<ArrayList<Trade>>() {}.type
+                                val trade = (application as App).gson.fromJson<List<Trade>>(text, listType)
+                                for (t in trade) {
+                                    mData.filter { t.symbol == it.symbol }
+                                            .forEach {
+                                                it.latestTrade = t
+                                                it.isUpdate = false
+                                            }
+                                }
+                                adapter.data.clear()
+                                mData.filter {
+                                    mNowCustomMarket.containsKey(it.symbol) && mNowCustomMarket[it.symbol]!!
+                                }.forEach {
+                                    adapter.data.add(it)
+                                }
+                                adapter.notifyDataSetChanged()
+                            } catch (e: Exception) {
+                                Log.e("webss", e.toString())
+                            }
+                        }
+                    }
+                })
 
         val marketSet = SharedPreferencesHelper.getStringSet(this@CustomMarketActivity, Constants.CUSTOM)
         mNowCustomMarket.clear()
@@ -85,7 +110,7 @@ class CustomMarketActivity : BaseActivity() {
                 adapter.ethUsdRate = ethUsdtRate
                 adapter.notifyDataSetChanged()
 
-                if (mCustomMarketObserver != null && !mCustomMarketObserver!!.isRunning) {
+                if (mCustomMarketObserver != null && !mCustomMarketObserver!!.isObserving) {
                     mCustomMarketObserver?.connect()
                 }
             } catch (e : ClassCastException) {
@@ -95,7 +120,7 @@ class CustomMarketActivity : BaseActivity() {
     }
 
     override fun onResume() {
-        if (mCustomMarketObserver != null && !mCustomMarketObserver!!.isRunning) {
+        if (mCustomMarketObserver != null && !mCustomMarketObserver!!.isObserving) {
             mCustomMarketObserver?.connect()
         }
         super.onResume()
@@ -133,75 +158,6 @@ class CustomMarketActivity : BaseActivity() {
             }
         }else{
             super.onActivityResult(requestCode, resultCode, data)
-        }
-    }
-
-    inner class CustomMarketObserver : WebSocketListener() {
-
-        var isRunning = false
-        var mOkHttpClient : OkHttpClient? = null
-        var mWebSocket : WebSocket? = null
-
-        fun connect() {
-            Log.i("CustomMarketObserver", "connect")
-            val request = Request.Builder()
-                    .url("wss://stream2.binance.com:9443/ws/!ticker@arr")
-                    .addHeader("Connection", "keep-alive")
-                    .build()
-            mOkHttpClient = (application as App).createHttpClient()
-            mWebSocket = mOkHttpClient?.newWebSocket(request, this)
-            mOkHttpClient?.dispatcher()?.executorService()?.shutdown()
-            isRunning = true
-        }
-
-        fun disconnect() {
-            Log.i("CustomMarketObserver", "disconnect")
-            mOkHttpClient?.dispatcher()?.cancelAll()
-            mWebSocket?.close(1000, "closed")
-            mWebSocket?.cancel()
-            isRunning = false
-        }
-
-        override fun onOpen(webSocket: WebSocket?, response: Response?) {
-            webSocket?.send("")
-        }
-
-        override fun onFailure(webSocket: WebSocket?, t: Throwable?, response: Response?) {
-            Log.e("webss", t?.toString())
-        }
-
-        override fun onClosing(webSocket: WebSocket?, code: Int, reason: String?) {
-            webSocket?.close(1000, null)
-        }
-
-        override fun onMessage(webSocket: WebSocket?, text: String?) {
-            Log.i("webss", text)
-            runOnUiThread {
-                try {
-                    val listType = object : TypeToken<ArrayList<Trade>>(){}.type
-                    val trade = (application as App).gson.fromJson<List<Trade>>(text, listType)
-                    for (t in trade) {
-                        mData.filter { t.symbol == it.symbol }
-                                .forEach {
-                                    it.latestTrade = t
-                                    it.isUpdate = false
-                                }
-                    }
-                    adapter.data.clear()
-                    mData.filter {
-                        mNowCustomMarket.containsKey(it.symbol) && mNowCustomMarket[it.symbol]!!
-                    }.forEach {
-                        adapter.data.add(it)
-                    }
-                    adapter.notifyDataSetChanged()
-                }catch (e : Exception) {
-                    Log.e("webss", e.toString())
-                }
-            }
-        }
-
-        override fun onMessage(webSocket: WebSocket?, bytes: ByteString?) {
-            Log.i("webss", bytes?.hex())
         }
     }
 }

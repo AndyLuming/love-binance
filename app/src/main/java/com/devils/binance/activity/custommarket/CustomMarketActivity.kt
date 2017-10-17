@@ -13,6 +13,7 @@ import com.devils.binance.activity.custom.CustomActivity
 import com.devils.binance.base.BaseActivity
 import com.devils.binance.bean.Product
 import com.devils.binance.bean.Trade
+import com.devils.binance.common.Constants
 import com.devils.binance.util.SharedPreferencesHelper
 import com.google.gson.reflect.TypeToken
 import okhttp3.*
@@ -63,7 +64,8 @@ class CustomMarketActivity : BaseActivity() {
 
         mCustomMarketObserver = CustomMarketObserver()
 
-        val marketSet = SharedPreferencesHelper.getStringSet(this@CustomMarketActivity, "custom")
+        val marketSet = SharedPreferencesHelper.getStringSet(this@CustomMarketActivity, Constants.CUSTOM)
+        mNowCustomMarket.clear()
         marketSet?.forEach { mNowCustomMarket.put(it, true) }
 
         if (intent != null){
@@ -119,11 +121,11 @@ class CustomMarketActivity : BaseActivity() {
 
                     val customMarketSet = mutableSetOf<String>()
 
-                    mNowCustomMarket.forEach{ customMarketSet.add(it.key) }
+                    mNowCustomMarket.forEach{ if (it.value) customMarketSet.add(it.key)}
 
                     SharedPreferencesHelper.run {
-                        putStringSet(this@CustomMarketActivity,
-                                        "custom", customMarketSet)
+                        clearStringSet(this@CustomMarketActivity,Constants.CUSTOM)
+                        putStringSet(this@CustomMarketActivity, Constants.CUSTOM, customMarketSet)
                     }
                 }catch (e : Exception) {
                     e.printStackTrace()
